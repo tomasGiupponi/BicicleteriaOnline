@@ -3,7 +3,7 @@ import Link from "next/link"
 
 function HomePage() {
   return (
-    <div>
+    <div className="flex justify-between">
       <h1
         className="text-4xl font-bold"
       >
