@@ -4,15 +4,39 @@ import { Label } from "@radix-ui/react-label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
-import { createProduct } from "../products.api"
+import { createProduct, updateProduct } from "../products.api"
+import { useParams, useRouter } from "next/navigation"
 
-export function ProductForm() {
 
-    const{ register,handleSubmit } = useForm();
+export function ProductForm({product}:any) {
+    const{ register,handleSubmit } = useForm({
+      defaultValues:{
+        name: product?.name,
+        description: product?.description,
+        price: product?.price,
+        image: product?.image,
+      }
+    });
+
+    const router= useRouter();
+    const params = useParams<{id: string}>();
+
     const onSubmit = handleSubmit(async data=>{
-        console.log(data)
-        await createProduct(data)
+        if(params?.id){
+           await updateProduct(params.id,{
+            ...data,
+            price: parseFloat(data.price)})
+        }else{
+          await createProduct({
+            ...data,
+            price: parseFloat(data.price),
+          })
+        }
+        
+        router.push("/");
+        router.refresh()
     })
+
   return (
     <form onSubmit={onSubmit}>
 
@@ -36,7 +60,11 @@ export function ProductForm() {
             </Label>
             <Input {...register('image')}/>
 
-            <Button>Confirmar</Button>
+            <Button>
+              {
+                params.id ? 'Actualizar' : 'Añadir'
+              }
+              </Button>
 
           </form>
   )
